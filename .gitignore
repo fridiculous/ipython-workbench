@@ -1,6 +1,10 @@
 # database profiles
 db.conf
 
+# no ipython notebooks here
+*.ipynb
+.ipynb_checkpoints/
+
 # cached files
 __pycache__
 *.pyc
