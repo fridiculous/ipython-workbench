@@ -1,0 +1,6 @@
+# database profiles
+db.conf
+
+# cached files
+__pycache__
+*.pyc
