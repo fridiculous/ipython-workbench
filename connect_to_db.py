@@ -6,39 +6,32 @@ from configparser import SafeConfigParser
 
 parser = SafeConfigParser()
 directory = os.path.dirname(__file__)
-filename = os.path.join(directory, 'db_profiles.config')
+filename = os.path.join(directory, 'db.conf')
 parser.read(filename)
 
 
 class ConnectToDB(object):
 
-    def __init__(self, dbtype='postgres'):
+    def __init__(self, db='default'):
         # load config
         self._cur = None
         self._conn = None
         self._database_conn = None
-        if dbtype=='postgres':
-            self.set_to_postgres()
-        elif dbtype=='redshift':
-            self.set_to_redshift()
-        else:
-            raise Exception("not a valid connection. please set 'dbtype', to 'postgres' or 'redshift'")
+        self._db = db
+        self.set_db(db='default')
 
-    def set_to_postgres(self):
-        self._database_conn = {}
-        self._database_conn['host'] = parser.get('postgres', 'host')
-        self._database_conn['port'] = parser.get('postgres', 'port')
-        self._database_conn['dbname'] = parser.get('postgres', 'dbname')
-        self._database_conn['user'] = parser.get('postgres', 'su_user')
-        self._database_conn['password'] = parser.get('postgres', 'su_password')
-
-    def set_to_redshift(self):
-        self._database_conn = {}
-        self._database_conn['host'] = parser.get('redshift', 'host')
-        self._database_conn['port'] = parser.get('redshift', 'port')
-        self._database_conn['dbname'] = parser.get('redshift', 'dbname')
-        self._database_conn['user'] = parser.get('redshift', 'su_user')
-        self._database_conn['password'] = parser.get('redshift', 'su_password')
+    def set_db(self, db='default'):
+        self._db = db
+        try:        
+            self._database_conn = {}
+            self._database_conn['host'] = parser.get(self._db, 'host')
+            self._database_conn['port'] = parser.get(self._db, 'port')
+            self._database_conn['dbname'] = parser.get(self._db, 'dbname')
+            self._database_conn['user'] = parser.get(self._db, 'user')
+            self._database_conn['password'] = parser.get(self._db, 'password')
+        except: 
+            raise Exception("""not a valid connection.
+                please match 'db' to keys in db.conf""")
 
     def connect(self):
         self._conn = psycopg2.connect(**self._database_conn)
